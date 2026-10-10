@@ -1,0 +1,5 @@
+google-genai
+streamlit
+requests
+openpyxl
+python-dotenv
