@@ -8,7 +8,8 @@ then a list of current names, and keeps the first one that works for your API ke
 """
 import os
 import time
-
+import streamlit as st
+from google import genai
 from google import genai
 from google.genai import types
 
@@ -56,15 +57,27 @@ operator the car rental price has not been configured.
 Tone: friendly, concise, professional. Prices are in INR."""
 
 
+
 class Chatbot:
     def __init__(self):
-        key = os.environ.get("GEMINI_API_KEY")
+        key = (
+            st.secrets.get("GEMINI_API_KEY")
+            or os.environ.get("GEMINI_API_KEY")
+        )
         if not key:
             raise RuntimeError("GEMINI_API_KEY is not set")
+
         self.client = genai.Client(api_key=key)
-        first = os.environ.get("GEMINI_MODEL")
-        self.candidates = ([first] if first else []) + [m for m in FALLBACK_MODELS if m != first]
-        self.model = None          # set once a model has answered
+
+        first = (
+            st.secrets.get("GEMINI_MODEL")
+            or os.environ.get("GEMINI_MODEL")
+        )
+        self.candidates = (
+            ([first] if first else [])
+            + [m for m in FALLBACK_MODELS if m != first]
+        )
+        self.model = None
         self.chat = None
 
     def _new_chat(self, model, history=None):
